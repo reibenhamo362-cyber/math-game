@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רעי - פרויקט חשיבה מתמטית</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Rubik', sans-serif; background: #0f172a; color: #f8fafc; }
+        .glass-card { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-gradient-to-tr from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-lg text-white">
+                    <i class="fa-solid me-1 fa-brain text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-300">פרויקט חשיבה מתמטית</h1>
+                    <p class="text-xs text-slate-400">כיתה ח' • לפי תוכנית משרד החינוך</p>
+                </div>
+            </div>
+            <nav class="flex bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60 shadow-inner gap-1">
+                <button onclick="switchTab('nim')" id="tab-nim" class="tab-btn px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all flex items-center gap-1.5 bg-indigo-600 text-white shadow-md"><i class="fa-solid fa-coins"></i><span>משחק המקלות</span></button>
+                <button onclick="switchTab('escape')" id="tab-escape" class="tab-btn px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5"><i class="fa-solid fa-key"></i><span>חדר בריחה</span></button>
+                <button onclick="switchTab('memory')" id="tab-memory" class="tab-btn px-3 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all text-slate-300 hover:text-white flex items-center gap-1.5"><i class="fa-solid fa-border-all"></i><span>משחק זיכרון</span></button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- 1. NIM GAME -->
+        <section id="sec-nim" class="space-y-6">
+            <div class="glass-card rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">משחק הנימים (אסטרטגיית מודולו 4)</h2>
+                        <p class="text-slate-400 text-sm mt-1">הסר 1, 2 או 3 מקלות. השחקן שלוקח את המקל האחרון <strong>מנצח!</strong></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="nim-mode" onchange="resetNimGame()" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl p-2.5 outline-none font-medium">
+                            <option value="vs-ai">נגד המחשב (AI מנצח)</option>
+                            <option value="vs-human">נגד חבר (2 שחקנים)</option>
+                        </select>
+                        <select id="nim-initial" onchange="resetNimGame()" class="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-xl p-2.5 outline-none font-medium">
+                            <option value="12">12 מקלות</option>
+                            <option value="15" selected>15 מקלות</option>
+                            <option value="18">18 מקלות</option>
+                            <option value="21">21 מקלות</option>
+                            <option value="24">24 מקלות</option>
+                            <option value="27">27 מקלות</option>
+                            <option value="30">30 מקלות</option>
+                            <option value="35">35 מקלות</option>
+                            <option value="40">40 מקלות</option>
+                            <option value="45">45 מקלות</option>
+                            <option value="50">50 מקלות</option>
+                        </select>
+                        <button onclick="resetNimGame()" class="bg-slate-700 hover:bg-slate-600 p-2.5 rounded-xl text-slate-200 transition"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                </div>
+
+                <div id="nim-status-bar" class="bg-indigo-950/70 border border-indigo-500/30 rounded-xl p-4 mb-6 flex justify-between items-center text-center shadow-inner">
+                    <div><span class="text-xs text-slate-400 block font-medium">מקלות שנותרו</span><span id="nim-count" class="text-3xl font-extrabold text-indigo-400">15</span></div>
+                    <div><span class="text-xs text-slate-400 block font-medium">תור נוכחי</span><span id="nim-turn" class="text-lg font-bold text-emerald-400">שחקן 1 (אתה)</span></div>
+                    <div><span class="text-xs text-slate-400 block font-medium">סטטוס</span><span id="nim-msg" class="text-sm font-medium text-slate-300">התחל במשחק!</span></div>
+                </div>
+
+                <div class="bg-slate-900/90 rounded-xl p-6 mb-6 border border-slate-800 min-h-[140px] flex items-center justify-center">
+                    <div id="matches-container" class="flex flex-wrap justify-center gap-2 max-h-40 overflow-y-auto p-2"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <button id="nim-btn-1" onclick="playerNimMove(1)" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition disabled:opacity-40">הסר 1</button>
+                    <button id="nim-btn-2" onclick="playerNimMove(2)" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition disabled:opacity-40">הסר 2</button>
+                    <button id="nim-btn-3" onclick="playerNimMove(3)" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition disabled:opacity-40">הסר 3</button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border-indigo-500/20 shadow-xl">
+                <h3 class="text-base font-bold text-amber-400 mb-1 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> ניתוח מתמטי למרצה (מודולו 4):</h3>
+                <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+                    האסטרטגיה המנצחת מתבססת על השארת כפולות של 4 ליריב. בכל סיבוב הסכום של מה שלוקחים השחקנים משלים ל-4.
+                </p>
+            </div>
+        </section>
+
+        <!-- 2. ESCAPE ROOM -->
+        <section id="sec-escape" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-6 shadow-2xl">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">חדר בריחה מתמטי - כיתה ח'</h2>
+                        <p class="text-slate-400 text-sm mt-1">פתור את 3 החידות מתוך מאגר 30 השאלות. זמן: <strong id="escape-timer" class="text-amber-400">00:00</strong></p>
+                    </div>
+                    <button onclick="initEscapeRoom()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i><span>חדר חדש</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" id="locks-container"></div>
+                <div id="active-puzzle-card" class="bg-slate-900/90 rounded-2xl p-6 border border-slate-700/80 shadow-inner"></div>
+            </div>
+        </section>
+
+        <!-- 3. MEMORY GAME (10 PAIRS) -->
+        <section id="sec-memory" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-6 shadow-2xl">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">משחק זיכרון מתמטי - כיתה ח' (10 זוגות)</h2>
+                        <p class="text-slate-400 text-sm mt-1">התאם בין משוואות, אחוזים וגאומטריה.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-slate-300 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">זוגות: <strong id="mem-score" class="text-emerald-400">0 / 10</strong></span>
+                        <button onclick="initMemoryGame()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow transition">ערבב מחדש</button>
+                    </div>
+                </div>
+                <div id="memory-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 perspective-1000"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-4 text-center text-xs text-slate-500">
+        פרויקט גמר בחשיבה מתמטית • תשפ"ו • כיתה ח' לפי משרד החינוך
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md'));
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            if (tab === 'escape' && escapePuzzles.length === 0) initEscapeRoom();
+            if (tab === 'memory' && memoryBoard.length === 0) initMemoryGame();
+        }
+
+        // --- 1. NIM GAME ---
+        let nimCount = 15, nimCurrentTurn = 1, nimMode = 'vs-ai';
+        function resetNimGame() {
+            nimCount = parseInt(document.getElementById('nim-initial').value);
+            nimMode = document.getElementById('nim-mode').value;
+            nimCurrentTurn = 1;
+            document.getElementById('nim-count').textContent = nimCount;
+            document.getElementById('nim-turn').textContent = 'שחקן 1 (אתה)';
+            document.getElementById('nim-msg').textContent = 'המשחק החל!';
+            renderMatches();
+            updateNimButtons(false);
+        }
+        function renderMatches() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = '';
+            for (let i = 0; i < nimCount; i++) {
+                const m = document.createElement('div');
+                m.className = 'w-2.5 h-16 bg-gradient-to-t from-amber-600 to-amber-300 rounded-t-md relative shadow-md';
+                container.appendChild(m);
+            }
+        }
+        function playerNimMove(take) {
+            if (take > nimCount) return;
+            nimCount -= take;
+            document.getElementById('nim-count').textContent = nimCount;
+            renderMatches();
+
+            if (nimCount === 0) {
+                let winnerName = nimMode === 'vs-ai' ? (nimCurrentTurn === 1 ? 'שחקן 1 (אתה) ניצח! 🏆' : 'המחשב ניצח!') : (`שחקן ${nimCurrentTurn} ניצח במשחק! 🏆`);
+                document.getElementById('nim-msg').textContent = winnerName;
+                document.getElementById('nim-turn').textContent = 'הסתיים';
+                confetti();
+                updateNimButtons(true);
+                return;
+            }
+
+            if (nimMode === 'vs-ai') {
+                document.getElementById('nim-turn').textContent = 'המחשב חושב...';
+                updateNimButtons(true);
+                setTimeout(aiNimMove, 700);
+            } else {
+                nimCurrentTurn = nimCurrentTurn === 1 ? 2 : 1;
+                document.getElementById('nim-turn').textContent = `שחקן ${nimCurrentTurn}`;
+            }
+        }
+        function aiNimMove() {
+            let take = nimCount % 4;
+            if (take === 0) take = 1;
+            nimCount -= take;
+            document.getElementById('nim-count').textContent = nimCount;
+            renderMatches();
+
+            if (nimCount === 0) {
+                document.getElementById('nim-msg').textContent = 'המחשב לקח את המקל האחרון וניצח! 🤖';
+                document.getElementById('nim-turn').textContent = 'הסתיים';
+                updateNimButtons(true);
+                return;
+            }
+            nimCurrentTurn = 1;
+            document.getElementById('nim-turn').textContent = 'שחקן 1 (אתה)';
+            updateNimButtons(false);
+        }
+        function updateNimButtons(d) {
+            for (let i = 1; i <= 3; i++) document.getElementById(`nim-btn-${i}`).disabled = d || i > nimCount;
+        }
+
+        // --- 2. ESCAPE ROOM (30 QUESTIONS - GRADE 8 STRICT CURRICULUM) ---
+        const escapePoolGrade8 = [
+            { title: 'משוואה לינארית 1', question: 'פתור את המשוואה: 3x - 5 = 10. מהו x?', answer: '5', hint: 'העבר את 5 לאגף ימין ואז מחלק ב-3.' },
+            { title: 'הנחה באחוזים 1', question: 'מחיר חולצה הוא 120 ש"ח. ניתנה הנחה של 20%. מהו מחיר החולצה לאחר ההנחה?', answer: '96', hint: 'חשב 20% מ-120 (שהם 24) והחסר מהמחיר המקורי.' },
+            { title: 'זוויות במשולש 1', question: 'במשולש זווית אחת היא 70 מעלות והשנייה היא 50 מעלות. מה גודל הזווית השלישית?', answer: '60', hint: 'סכום זוויות במשולש הוא תמיד 180 מעלות.' },
+            { title: 'פונקציה קווית 1', question: 'נתונה הפונקציה y = 2x + 4. מהו ערך ה-y כאשר x = 3?', answer: '10', hint: 'הצב 3 במקום x וחשב את התוצאה.' },
+            { title: 'קנייה ומכירה 1', question: 'תלמיד קנה 4 מחברות בעלות של 6 ש"ח כל אחת ושילם בשטר של 50 ש"ח. כמה עודף קיבל?', answer: '26', hint: 'חשב כמה עלו המחברות יחד והחסר מ-50.' },
+            { title: 'משוואה לינארית 2', question: 'פתור את המשוואה: 5x + 3 = 2x + 15. מהו x?', answer: '4', hint: 'העבר את 2x שמאלה ואת 3 ימינה.' },
+            { title: 'התייקרות באחוזים', question: 'מחיר זוג אופניים היה 400 ש"ח והתייקר ב-10%. מהו המחיר החדש?', answer: '440', hint: 'חשב 10% מ-400 והוסף למחיר המקורי.' },
+            { title: 'היקף מלבן', question: 'אורך מלבן הוא 8 ס"מ והרוחב הוא 5 ס"מ. מהו היקף המלבן בס"מ?', answer: '26', hint: 'סכום כל הצלעות: (אורך + רוחב) כפול 2.' },
+            { title: 'שטח מלבן', question: 'מהו שטח מלבן שאורכו 7 ס"מ ורוחבו 4 ס"מ?', answer: '28', hint: 'הכפל אורך ברוחב.' },
+            { title: 'ממוצע חשבוני', question: 'הציונים של תלמיד היו: 80, 90 ו-100. מהו ממוצע הציונים שלו?', answer: '90', hint: 'חבר את הציונים וחלק בכמותם (3).' },
+            { title: 'משוואה עם סוגריים', question: 'פתור: 2(x + 3) = 16. מהו x?', answer: '5', hint: 'פתח סוגריים או חלק מיד ב-2.' },
+            { title: 'הנחה באחוזים 2', question: 'מעיל עולה 250 ש"ח והוזל ב-30%. מהו מחירו לאחר ההנחה?', answer: '175', hint: 'חשב 30% מ-250 והחסר.' },
+            { title: 'זוויות במשולש 2', question: 'במשולש שווה שוקיים זווית הבסיס היא 50 מעלות. מה גודל זווית הראש?', answer: '80', hint: 'שתי זוויות הבסיס שוות (50+50=100), השלם ל-180.' },
+            { title: 'פונקציה קווית 2', question: 'מהו שיפוע הישר שמשוואתו היא y = -3x + 7?', answer: '-3', hint: 'השיפוע הוא המקדם של x.' },
+            { title: 'ערך y בישר', question: 'בישר y = 4x - 5, מהו y כאשר x = 2?', answer: '3', hint: 'הצב 2 במקום x.' },
+            { title: 'בעיית גילאים', question: 'גילו של אבי הוא פי 3 מגילו של בן. סכום גילם הוא 40. מה גילו של הבן?', answer: '10', hint: 'x + 3x = 40 => 4x = 40.' },
+            { title: 'השוואת מחירים', question: 'מחיר מחשב נייד עלה מ-2000 ל-2300 ש"ח. מהו אחוז ההתייקרות?', answer: '15', hint: 'עלייה של 300 מתוך 2000.' },
+            { title: 'היקף ריבוע', question: 'מהו היקף ריבוע שצלעו היא 12 ס"מ?', answer: '48', hint: 'הכפל את אורך הצלע ב-4.' },
+            { title: 'שטח ריבוע', question: 'מהו שטח ריבוע שצלעו היא 9 ס"מ?', answer: '81', hint: 'צלע כפול צלע (9 בריבוע).' },
+            { title: 'בעיית תנועה פשוטה', question: 'רכב נסע במהירות 80 קמ"ש במשך 3 שעות. כמה קילומטרים עבר?', answer: '240', hint: 'מהירות כפול זמן.' },
+            { title: 'משוואה פשוטה', question: 'מצא את x אם: 7x = 56', answer: '8', hint: 'חלק את 56 ב-7.' },
+            { title: 'שברים פשוטים במשוואה', question: 'פתור: x / 4 = 6', answer: '24', hint: 'הכפל את 6 ב-4.' },
+            { title: 'אחוזים הפוכים', question: 'ידוע כי 15% מסכום מסוים שווים ל-45. מהו הסכום הכולל?', answer: '300', hint: 'חלק 45 ב-0.15.' },
+            { title: 'זווית חיצונית במשולש', question: 'זווית חיצונית במשולש שווה ל-110 מעלות. אחת מזוויות הפנים שאינה צמודה אליה היא 40 מעלות. מה גודל זווית הפנים השנייה?', answer: '70', hint: 'זווית חיצונית שווה לסכום שתי זוויות הפנים שאינן צמודות לה.' },
+            { title: 'נקודת חיתוך ציר y', question: 'מהו ערך החיתוך עם ציר ה-y של הפונקציה y = 5x - 12?', answer: '-12', hint: 'האיבר החופשי b בביטוי y = mx + b.' },
+            { title: 'הוצאת גורם משותף', question: 'פשט את הביטוי 3x + 12 והצב x = 5. מה התוצאה?', answer: '27', hint: '3 כפול 5 ועוד 12.' },
+            { title: 'הנחה נוספת', question: 'ספר שעלה 80 ש"ח נמכר ב-25% הנחה. כמה שילם הלקוח?', answer: '60', hint: '25% מ-80 זה 20.' },
+            { title: 'סכום זוויות במרובע', question: 'מהו סכום זוויות הפנים במרובע?', answer: '360', hint: 'ניתן לחלק את המרובע לשני משולשים.' },
+            { title: 'חישוב ממוצע', question: 'המספרים הם 10, 20, 30, 40. מהו הממוצע שלהם?', answer: '25', hint: 'סכום המספרים חלקי 4.' },
+            { title: 'משוואת בסיס', question: 'פתור את המשוואה: 10 - x = 4', answer: '6', hint: 'איזה מספר נחסר מ-10 כדי לקבל 4?' }
+        ];
+        let escapePuzzles = [], currentPuzzleIndex = 0, escapeSeconds = 0, escapeTimerInterval = null;
+
+        function initEscapeRoom() {
+            const shuffled = [...escapePoolGrade8].sort(() => 0.5 - Math.random());
+            escapePuzzles = shuffled.slice(0, 3).map((p, i) => ({ ...p, id: i, solved: false, userAns: '' }));
+            currentPuzzleIndex = 0;
+            escapeSeconds = 0;
+            clearInterval(escapeTimerInterval);
+            escapeTimerInterval = setInterval(() => {
+                escapeSeconds++;
+                let m = String(Math.floor(escapeSeconds / 60)).padStart(2, '0');
+                let s = String(escapeSeconds % 60).padStart(2, '0');
+                let tEl = document.getElementById('escape-timer');
+                if(tEl) tEl.textContent = `${m}:${s}`;
+            }, 1000);
+            renderLocksDisplay();
+            renderActivePuzzle();
+        }
+        function renderLocksDisplay() {
+            const c = document.getElementById('locks-container');
+            c.innerHTML = '';
+            escapePuzzles.forEach((p, i) => {
+                const isActive = i === currentPuzzleIndex;
+                c.innerHTML += `
+                    <div onclick="currentPuzzleIndex=${i};renderActivePuzzle();" class="p-3.5 rounded-xl border cursor-pointer transition flex items-center justify-between ${p.solved ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300' : isActive ? 'bg-indigo-900/80 border-indigo-500 text-white shadow-md' : 'bg-slate-800/60 border-slate-700 text-slate-300'}">
+                        <div>
+                            <span class="text-xs text-slate-400 block">מנעול ${i+1}</span>
+                            <span class="font-bold text-sm">${p.title}</span>
+                        </div>
+                        <span class="text-sm font-bold">${p.solved ? 'פתוח ✓' : 'נעול 🔒'}</span>
+                    </div>
+                `;
+            });
+        }
+        function renderActivePuzzle() {
+            const p = escapePuzzles[currentPuzzleIndex];
+            document.getElementById('active-puzzle-card').innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30 font-semibold">חידה ${currentPuzzleIndex + 1} מתוך 3</span>
+                        <span class="text-xs text-amber-400 cursor-pointer" onclick="alert('רמז: ' + '${p.hint}')">💡 הצג רמז</span>
+                    </div>
+                    <h3 class="text-base font-bold text-white">${p.question}</h3>
+                    <div class="flex gap-3">
+                        <input type="text" id="escape-input" value="${p.userAns}" placeholder="הכנס תשובה מספרית..." class="bg-slate-800 border border-slate-600 rounded-xl px-4 py-2 text-white outline-none w-full text-base font-bold" ${p.solved ? 'disabled' : ''}>
+                        ${!p.solved ? `<button onclick="checkEscapeAnswer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl shadow">פתח</button>` : `<span class="text-emerald-400 font-bold px-4 py-2 bg-emerald-950/60 rounded-xl border border-emerald-500/40">הושלם!</span>`}
+                    </div>
+                </div>
+            `;
+        }
+        function checkEscapeAnswer() {
+            const p = escapePuzzles[currentPuzzleIndex];
+            const val = document.getElementById('escape-input').value.trim();
+            p.userAns = val;
+            if (val === p.answer) {
+                p.solved = true;
+                renderLocksDisplay();
+                renderActivePuzzle();
+                if (escapePuzzles.every(x => x.solved)) {
+                    clearInterval(escapeTimerInterval);
+                    confetti();
+                    setTimeout(() => alert('🎉 כל הכבוד! פתחת את כל המנעולים בחדר הבריחה בהצלחה!'), 300);
+                }
+            } else {
+                alert('תשובה שגויה, נסה שוב!');
+            }
+        }
+
+        // --- 3. MEMORY GAME (10 PAIRS) ---
+        const memoryPoolGrade8 = [
+            { t: 'פתרון 2x = 10', m: '5' },
+            { t: '25% מתוך 80', m: '20' },
+            { t: 'שיפוע הישר y = 3x - 1', m: '3' },
+            { t: 'סכום זוויות במשולש', m: '180°' },
+            { t: 'היקף ריבוע שצלעו 6', m: '24' },
+            { t: 'שטח מלבן 4 על 5', m: '20' },
+            { t: 'זווית ישרה', m: '90°' },
+            { t: '3x + 4x', m: '7x' },
+            { t: '50% מתוך 60', m: '30' },
+            { t: 'פתרון x + 4 = 9', m: '5' }
+        ];
+        let memoryBoard = [], firstCard = null, matchesFound = 0;
+
+        function initMemoryGame() {
+            matchesFound = 0;
+            firstCard = null;
+            document.getElementById('mem-score').textContent = `0 / 10`;
+            let cards = [];
+            memoryPoolGrade8.forEach((p, i) => { cards.push({ val: p.t, id: i }, { val: p.m, id: i }); });
+            memoryBoard = cards.sort(() => 0.5 - Math.random()).map((c, i) => ({ ...c, boardId: i, flipped: false, matched: false }));
+            renderMemoryGrid();
+        }
+        function renderMemoryGrid() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            memoryBoard.forEach((c) => {
+                grid.innerHTML += `
+                    <div onclick="flipMemoryCard(${c.boardId})" class="h-20 rounded-xl cursor-pointer transition-all flex items-center justify-center p-2 text-center font-bold text-xs shadow-lg ${c.flipped || c.matched ? 'bg-slate-800 border-2 border-indigo-400 text-white' : 'bg-gradient-to-br from-indigo-800 to-slate-800 border border-indigo-500/40 text-indigo-300'}">
+                        ${c.flipped || c.matched ? c.val : '<i class="fa-solid fa-question text-lg"></i>'}
+                    </div>
+                `;
+            });
+        }
+        function flipMemoryCard(boardId) {
+            let c = memoryBoard.find(x => x.boardId === boardId);
+            if (c.flipped || c.matched) return;
+            c.flipped = true;
+            renderMemoryGrid();
+
+            if (!firstCard) {
+                firstCard = c;
+            } else {
+                if (firstCard.id === c.id) {
+                    firstCard.matched = true; c.matched = true; firstCard = null;
+                    matchesFound++;
+                    document.getElementById('mem-score').textContent = `${matchesFound} / 10`;
+                    if (matchesFound === 10) {
+                        confetti();
+                        setTimeout(() => alert('🏆 כל הכבוד! השלמת את כל 10 הזוגות במשחק הזיכרון!'), 300);
+                    }
+                } else {
+                    let tempFirst = firstCard;
+                    firstCard = null;
+                    setTimeout(() => { tempFirst.flipped = false; c.flipped = false; renderMemoryGrid(); }, 800);
+                }
+            }
+        }
+
+        resetNimGame();
+    </script>
+</body>
+</html>
