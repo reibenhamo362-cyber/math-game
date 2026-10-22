@@ -79,8 +79,8 @@
                         <i class="fa-solid fa-bars-staggered"></i> 3. משחק המקלות (Nim Game)
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-300">
-                        <strong>מטרה:</strong> אתגר חשיבה לוגית ואסטרטגיה שבו השחקן בוחר את כמות המקלות ההתחלתית (עד 50) ומנסה לקחת את המקל האחרון כדי לנצח!<br>
-                        <strong>איך משחקים:</strong> בוחרים בכל תור כמה מקלות לקחת (1, 2 או 3). מי שלוקח את המקל האחרון בערימה – מנצח בגדול!
+                        <strong>מטרה:</strong> אתגר חשיבה לוגית ואסטרטגיה שבו בוחרים את כמות המקלות (עד 50) ומשחקים <strong>נגד מחשב או נגד חבר</strong>. מי שלוקח את המקל האחרון – מנצח!<br>
+                        <strong>איך משחקים:</strong> בוחרים בכל תור כמה מקלות לקחת (1, 2 או 3).
                     </p>
                 </div>
             </div>
@@ -187,16 +187,33 @@
             <div class="max-w-xl mx-auto bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl">
                 <div class="text-center mb-6 border-b border-slate-700 pb-4">
                     <h2 class="text-xl font-bold text-white">משחק המקלות (Nim)</h2>
-                    <p class="text-xs text-slate-400 mt-1">בחרו כמות מקלות (עד 50). מי שלוקח את המקל האחרון – מנצח!</p>
+                    <p class="text-xs text-slate-400 mt-1">בחרו הגדרות, ושחקו נגד המחשב או נגד חבר! מי שלוקח את המקל האחרון – מנצח!</p>
                 </div>
 
                 <!-- Setup Section -->
-                <div id="nim-setup" class="bg-slate-900/80 p-5 rounded-xl border border-slate-700/80 mb-6 text-center">
-                    <label class="block text-sm text-slate-300 mb-2">בחר כמות מקלות התחלתית (10 עד 50):</label>
-                    <div class="flex justify-center items-center gap-3">
-                        <input type="number" id="nim-custom-sticks" min="10" max="50" value="21" class="w-24 bg-slate-800 border border-slate-600 text-center text-white font-bold rounded-lg px-3 py-2 text-lg focus:outline-none focus:border-emerald-500">
-                        <button onclick="startCustomNimGame()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition shadow">
-                            התחל משחק
+                <div id="nim-setup" class="bg-slate-900/80 p-5 rounded-xl border border-slate-700/80 mb-6 text-center space-y-4">
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2">בחר מצב משחק:</label>
+                        <div class="flex justify-center gap-3">
+                            <button id="nim-mode-ai" onclick="selectNimMode('ai')" class="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg border border-emerald-400 text-sm transition">
+                                <i class="fa-solid fa-robot"></i> נגד מחשב (AI)
+                            </button>
+                            <button id="nim-mode-pvp" onclick="selectNimMode('pvp')" class="px-4 py-2 bg-slate-700 text-slate-300 font-bold rounded-lg border border-slate-600 text-sm transition hover:bg-slate-600">
+                                <i class="fa-solid fa-users"></i> נגד חבר (2 שחקנים)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2">בחר כמות מקלות התחלתית (10 עד 50):</label>
+                        <div class="flex justify-center items-center gap-3">
+                            <input type="number" id="nim-custom-sticks" min="10" max="50" value="21" class="w-24 bg-slate-800 border border-slate-600 text-center text-white font-bold rounded-lg px-3 py-2 text-lg focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="startCustomNimGame()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition shadow text-base">
+                            התחל משחק!
                         </button>
                     </div>
                 </div>
@@ -224,7 +241,7 @@
                 <div id="nim-result" class="hidden text-center py-6">
                     <h3 id="nim-result-text" class="text-2xl font-bold mb-4"></h3>
                     <button onclick="resetNimSetup()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">
-                        משחק חדש / שינוי מקלות
+                        משחק חדש / שינוי הגדרות
                     </button>
                 </div>
             </div>
@@ -300,7 +317,6 @@
         let escapeScore = 0;
 
         function initEscapeRoom() {
-            // Shuffle and pick 5 random questions for the run
             escapeCurrentQuestions = [...fullEscapePool].sort(() => Math.random() - 0.5).slice(0, 5);
             escapeCurrentStage = 0;
             escapeScore = 0;
@@ -395,7 +411,6 @@
                 memoryCards.push({ id: idx, text: pair.a, type: 'a' });
             });
 
-            // Shuffle
             memoryCards.sort(() => Math.random() - 0.5);
 
             memoryCards.forEach((card, idx) => {
@@ -424,7 +439,6 @@
                 
                 const [c1, c2] = flippedCards;
                 if (c1.card.id === c2.card.id && c1.card.type !== c2.card.type) {
-                    // Match
                     c1.el.classList.add('matched', 'opacity-60');
                     c2.el.classList.add('matched', 'opacity-60');
                     matchedPairs++;
@@ -436,7 +450,6 @@
                         document.getElementById('memory-final-stats').textContent = `מצאתם את כל 10 הזוגות ב-${memoryMoves} מהלכים בלבד!`;
                     }
                 } else {
-                    // No Match
                     setTimeout(() => {
                         c1.el.className = "h-24 bg-slate-700 border border-slate-600 rounded-xl flex items-center justify-center p-2 cursor-pointer text-center font-bold text-xs sm:text-sm select-none transition-all hover:bg-slate-650 shadow";
                         c1.el.innerHTML = `<span class="text-slate-400 text-xl"><i class="fa-solid fa-question"></i></span>`;
@@ -449,10 +462,25 @@
         }
 
         // ==========================================
-        // GAME 3: NIM GAME LOGIC (UP TO 50 STICKS, LAST WINS)
+        // GAME 3: NIM GAME LOGIC (AI OR PVP)
         // ==========================================
         let nimSticks = 21;
-        let isPlayerTurn = true;
+        let nimMode = 'ai'; // 'ai' or 'pvp'
+        let nimCurrentTurn = 1; // 1 for Player 1 (or Player), 2 for Player 2 (or AI)
+
+        function selectNimMode(mode) {
+            nimMode = mode;
+            const btnAi = document.getElementById('nim-mode-ai');
+            const btnPvp = document.getElementById('nim-mode-pvp');
+
+            if (mode === 'ai') {
+                btnAi.className = "px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg border border-emerald-400 text-sm transition";
+                btnPvp.className = "px-4 py-2 bg-slate-700 text-slate-300 font-bold rounded-lg border border-slate-600 text-sm transition hover:bg-slate-600";
+            } else {
+                btnPvp.className = "px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-lg border border-emerald-400 text-sm transition";
+                btnAi.className = "px-4 py-2 bg-slate-700 text-slate-300 font-bold rounded-lg border border-slate-600 text-sm transition hover:bg-slate-600";
+            }
+        }
 
         function startCustomNimGame() {
             const input = document.getElementById('nim-custom-sticks');
@@ -461,12 +489,13 @@
             if (val > 50) val = 50;
             
             nimSticks = val;
-            isPlayerTurn = true;
+            nimCurrentTurn = 1;
 
             document.getElementById('nim-setup').classList.add('hidden');
             document.getElementById('nim-play-area').classList.remove('hidden');
             document.getElementById('nim-result').classList.add('hidden');
-            document.getElementById('nim-turn-indicator').textContent = 'התור שלך! כמה מקלות לקחת?';
+            
+            updateNimTurnIndicator();
             updateNimUI();
         }
 
@@ -474,6 +503,15 @@
             document.getElementById('nim-play-area').classList.add('hidden');
             document.getElementById('nim-result').classList.add('hidden');
             document.getElementById('nim-setup').classList.remove('hidden');
+        }
+
+        function updateNimTurnIndicator() {
+            const indicator = document.getElementById('nim-turn-indicator');
+            if (nimMode === 'ai') {
+                indicator.textContent = (nimCurrentTurn === 1) ? 'התור שלך! כמה מקלות לקחת?' : 'המחשב חושב...';
+            } else {
+                indicator.textContent = (nimCurrentTurn === 1) ? 'תור שחקן 1 (ירוק): כמה מקלות לקחת?' : 'תור שחקן 2 (כחול): כמה מקלות לקחת?';
+            }
         }
 
         function updateNimUI() {
@@ -488,48 +526,60 @@
         }
 
         function takeNimSticks(num) {
-            if (!isPlayerTurn || nimSticks < num) return;
+            if (nimSticks < num) return;
+            if (nimMode === 'ai' && nimCurrentTurn !== 1) return; // AI is thinking
 
             nimSticks -= num;
             updateNimUI();
 
             if (nimSticks === 0) {
-                endNimGame(true); // Player took last stick -> WON!
+                endNimGame(nimCurrentTurn); // Current player took the last stick -> Winner!
                 return;
             }
 
-            isPlayerTurn = false;
-            document.getElementById('nim-turn-indicator').textContent = 'המחשב חושב...';
+            if (nimMode === 'ai') {
+                nimCurrentTurn = 2; // AI Turn
+                updateNimTurnIndicator();
 
-            setTimeout(() => {
-                let computerTake = nimSticks % 4;
-                if (computerTake === 0) computerTake = 1;
-                if (computerTake > nimSticks) computerTake = nimSticks;
+                setTimeout(() => {
+                    let computerTake = nimSticks % 4;
+                    if (computerTake === 0) computerTake = 1;
+                    if (computerTake > nimSticks) computerTake = nimSticks;
 
-                nimSticks -= computerTake;
-                updateNimUI();
+                    nimSticks -= computerTake;
+                    updateNimUI();
 
-                if (nimSticks === 0) {
-                    endNimGame(false); // Computer took last stick -> Player lost
-                } else {
-                    isPlayerTurn = true;
-                    document.getElementById('nim-turn-indicator').textContent = 'התור שלך! כמה מקלות לקחת?';
-                }
-            }, 1000);
+                    if (nimSticks === 0) {
+                        endNimGame(2); // AI took last stick -> AI Won!
+                    } else {
+                        nimCurrentTurn = 1; // Back to player
+                        updateNimTurnIndicator();
+                    }
+                }, 1000);
+            } else {
+                // PvP Mode
+                nimCurrentTurn = (nimCurrentTurn === 1) ? 2 : 1;
+                updateNimTurnIndicator();
+            }
         }
 
-        function endNimGame(playerWon) {
+        function endNimGame(winnerTurn) {
             document.getElementById('nim-play-area').classList.add('hidden');
             const result = document.getElementById('nim-result');
             const resultText = document.getElementById('nim-result-text');
             result.classList.remove('hidden');
 
-            if (playerWon) {
-                resultText.className = "text-2xl font-bold text-emerald-400";
-                resultText.textContent = "כל הכבוד! לקחת את המקל האחרון וניצחת!";
+            if (nimMode === 'ai') {
+                if (winnerTurn === 1) {
+                    resultText.className = "text-2xl font-bold text-emerald-400";
+                    resultText.textContent = "כל הכבוד! לקחת את המקל האחרון וניצחת!";
+                } else {
+                    resultText.className = "text-2xl font-bold text-rose-400";
+                    resultText.textContent = "הפסדת! המחשב לקח את המקל האחרון.";
+                }
             } else {
-                resultText.className = "text-2xl font-bold text-rose-400";
-                resultText.textContent = "הפסדת! המחשב לקח את המקל האחרון.";
+                resultText.className = "text-2xl font-bold text-emerald-400";
+                resultText.textContent = `כל הכבוד! שחקן ${winnerTurn} לקח את המקל האחרון וניצח! 🏆`;
             }
         }
 
@@ -537,7 +587,6 @@
         window.onload = function() {
             initEscapeRoom();
             initMemoryGame();
-            // Nim starts at setup
         };
     </script>
 </body>
