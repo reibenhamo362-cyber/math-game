@@ -56,21 +56,20 @@
                 
                 <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                     <h4 class="font-bold text-emerald-400 flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-key"></i> 1. חדר בריחה מתמטי (Math Escape Room)
+                        <i class="fa-solid fa-key"></i> 1. חדר בריחה מתמטי (עם שעון עצר!)
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-300">
-                        <strong>מטרה:</strong> לענות נכונה על שאלות מתמטיות (משוואות לינאריות, אחוזים, זוויות במשולשים) כדי לצבור נקודות ולברוח מהחדר.<br>
-                        <strong>איך משחקים:</strong> בוחרים תשובה נכונה מתוך 4 אפשרויות אמריקאיות לכל שאלה. צוברים נקודות על כל תשובה נכונה מתוך מאגר עשיר.
+                        <strong>מטרה:</strong> לפתור את כל השאלות לפני שהזמן (5 דקות) נגמר!<br>
+                        <strong>איך משחקים:</strong> בוחרים תשובה נכונה מתוך 4 אפשרויות אמריקאיות. השעון רץ ומדרבן אתכם לסיים מהר.
                     </p>
                 </div>
 
                 <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                     <h4 class="font-bold text-emerald-400 flex items-center gap-2 mb-1">
-                        <i class="fa-solid fa-puzzle-piece"></i> 2. משחק הזיכרון המתמטי (Math Memory Match)
+                        <i class="fa-solid fa-puzzle-piece"></i> 2. משחק הזיכרון המתמטי (10 זוגות)
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-300">
-                        <strong>מטרה:</strong> להתאים בין 10 בעיות מתמטיות (משוואות/תרגילים) לבין הפתרונות הנכונים שלהן.<br>
-                        <strong>איך משחקים:</strong> הופכים שני קלפים בכל תור. אם יש התאמה מלאה בין השאלה לתוצאה – הקלפים נשארים פתוחים.
+                        <strong>מטרה:</strong> להתאים בין 10 בעיות מתמטיות (משוואות/תרגילים) לבין הפתרונות הנכונים שלהן במינימום מהלכים.
                     </p>
                 </div>
 
@@ -79,8 +78,7 @@
                         <i class="fa-solid fa-bars-staggered"></i> 3. משחק המקלות (Nim Game)
                     </h4>
                     <p class="text-xs sm:text-sm text-slate-300">
-                        <strong>מטרה:</strong> אתגר חשיבה לוגית ואסטרטגיה שבו בוחרים את כמות המקלות (עד 50) ומשחקים <strong>נגד מחשב או נגד חבר</strong>. מי שלוקח את המקל האחרון – מנצח!<br>
-                        <strong>איך משחקים:</strong> בוחרים בכל תור כמה מקלות לקחת (1, 2 או 3).
+                        <strong>מטרה:</strong> לשחק נגד המחשב או נגד חבר, לבחור כמות מקלות (עד 50), ולגרום ליריב לקחת את המקל האחרון (מי שלוקח אחרון מנצח!).
                     </p>
                 </div>
             </div>
@@ -115,11 +113,17 @@
                 <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                     <div>
                         <span id="escape-stage-badge" class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold rounded-md">שאלה 1 מתוך 5</span>
-                        <h2 class="text-xl font-bold text-white mt-1">חדר הבריחה המתמטי (מאגר 30 שאלות)</h2>
+                        <h2 class="text-xl font-bold text-white mt-1">חדר הבריחה המתמטי</h2>
                     </div>
-                    <div class="text-left">
-                        <span class="text-xs text-slate-400 block">ניקוד מצטבר</span>
-                        <span id="escape-score" class="text-xl font-bold text-emerald-400">0</span>
+                    <div class="flex gap-4">
+                        <div class="text-center">
+                            <span class="text-xs text-slate-400 block">זמן נותר</span>
+                            <span id="escape-timer" class="text-lg font-bold text-amber-400">05:00</span>
+                        </div>
+                        <div class="text-left">
+                            <span class="text-xs text-slate-400 block">ניקוד</span>
+                            <span id="escape-score" class="text-lg font-bold text-emerald-400">0</span>
+                        </div>
                     </div>
                 </div>
 
@@ -137,9 +141,9 @@
 
                 <div id="escape-finished" class="hidden text-center py-8">
                     <div class="inline-flex p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-4">
-                        <i class="fa-solid fa-trophy text-4xl"></i>
+                        <i id="escape-finish-icon" class="fa-solid fa-trophy text-4xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">כל הכבוד! סיימתם את האתגר בהצלחה!</h3>
+                    <h3 id="escape-finish-title" class="text-2xl font-bold text-white mb-2">כל הכבוד! סיימתם את האתגר בהצלחה!</h3>
                     <p id="escape-final-score" class="text-slate-300 mb-6">השגתם ציון מעולה.</p>
                     <button onclick="initEscapeRoom()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl transition">
                         שחק שוב
@@ -187,7 +191,7 @@
             <div class="max-w-xl mx-auto bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl">
                 <div class="text-center mb-6 border-b border-slate-700 pb-4">
                     <h2 class="text-xl font-bold text-white">משחק המקלות (Nim)</h2>
-                    <p class="text-xs text-slate-400 mt-1">בחרו הגדרות, ושחקו נגד המחשב או נגד חבר! מי שלוקח את המקל האחרון – מנצח!</p>
+                    <p class="text-xs text-slate-400 mt-1">בחרו הגדרות ושחקו נגד מחשב או נגד חבר! מי שלוקח את המקל האחרון – מנצח!</p>
                 </div>
 
                 <!-- Setup Section -->
@@ -277,7 +281,7 @@
         }
 
         // ==========================================
-        // GAME 1: ESCAPE ROOM LOGIC (30 QUESTIONS POOL)
+        // GAME 1: ESCAPE ROOM LOGIC (WITH TIMER)
         // ==========================================
         const fullEscapePool = [
             { q: "פתרו את המשוואה: 3x + 5 = 20", options: ["x = 5", "x = 4", "x = 6", "x = 3"], correct: 0 },
@@ -315,8 +319,14 @@
         let escapeCurrentQuestions = [];
         let escapeCurrentStage = 0;
         let escapeScore = 0;
+        let escapeTimerInterval = null;
+        let escapeTimeLeft = 300; // 5 minutes
 
         function initEscapeRoom() {
+            clearInterval(escapeTimerInterval);
+            escapeTimeLeft = 300;
+            startEscapeTimer();
+
             escapeCurrentQuestions = [...fullEscapePool].sort(() => Math.random() - 0.5).slice(0, 5);
             escapeCurrentStage = 0;
             escapeScore = 0;
@@ -324,6 +334,34 @@
             document.getElementById('escape-finished').classList.add('hidden');
             document.getElementById('escape-content').classList.remove('hidden');
             loadEscapeQuestion();
+        }
+
+        function startEscapeTimer() {
+            updateEscapeTimerDisplay();
+            escapeTimerInterval = setInterval(() => {
+                escapeTimeLeft--;
+                updateEscapeTimerDisplay();
+                if (escapeTimeLeft <= 0) {
+                    clearInterval(escapeTimerInterval);
+                    endEscapeTimeOut();
+                }
+            }, 1000);
+        }
+
+        function updateEscapeTimerDisplay() {
+            const minutes = Math.floor(escapeTimeLeft / 60);
+            const seconds = escapeTimeLeft % 60;
+            document.getElementById('escape-timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function endEscapeTimeOut() {
+            clearInterval(escapeTimerInterval);
+            document.getElementById('escape-content').classList.add('hidden');
+            document.getElementById('escape-finished').classList.remove('hidden');
+            document.getElementById('escape-finish-icon').className = "fa-solid fa-hourglass-end text-4xl text-rose-400";
+            document.getElementById('escape-finish-title').textContent = "הזמן נגמר! נסו שוב";
+            document.getElementById('escape-final-score').textContent = `הזמן אזל. ציונכם היה: ${escapeScore} מתוך 100.`;
         }
 
         function loadEscapeQuestion() {
@@ -362,8 +400,11 @@
                     if (escapeCurrentStage < escapeCurrentQuestions.length) {
                         loadEscapeQuestion();
                     } else {
+                        clearInterval(escapeTimerInterval);
                         document.getElementById('escape-content').classList.add('hidden');
                         document.getElementById('escape-finished').classList.remove('hidden');
+                        document.getElementById('escape-finish-icon').className = "fa-solid fa-trophy text-4xl text-amber-400";
+                        document.getElementById('escape-finish-title').textContent = "כל הכבוד! ברחתם מהחדר בזמן!";
                         document.getElementById('escape-final-score').textContent = `השגת ציון סופי: ${escapeScore} מתוך 100!`;
                     }
                 }, 1000);
@@ -465,8 +506,8 @@
         // GAME 3: NIM GAME LOGIC (AI OR PVP)
         // ==========================================
         let nimSticks = 21;
-        let nimMode = 'ai'; // 'ai' or 'pvp'
-        let nimCurrentTurn = 1; // 1 for Player 1 (or Player), 2 for Player 2 (or AI)
+        let nimMode = 'ai';
+        let nimCurrentTurn = 1;
 
         function selectNimMode(mode) {
             nimMode = mode;
@@ -527,18 +568,18 @@
 
         function takeNimSticks(num) {
             if (nimSticks < num) return;
-            if (nimMode === 'ai' && nimCurrentTurn !== 1) return; // AI is thinking
+            if (nimMode === 'ai' && nimCurrentTurn !== 1) return;
 
             nimSticks -= num;
             updateNimUI();
 
             if (nimSticks === 0) {
-                endNimGame(nimCurrentTurn); // Current player took the last stick -> Winner!
+                endNimGame(nimCurrentTurn);
                 return;
             }
 
             if (nimMode === 'ai') {
-                nimCurrentTurn = 2; // AI Turn
+                nimCurrentTurn = 2;
                 updateNimTurnIndicator();
 
                 setTimeout(() => {
@@ -550,14 +591,13 @@
                     updateNimUI();
 
                     if (nimSticks === 0) {
-                        endNimGame(2); // AI took last stick -> AI Won!
+                        endNimGame(2);
                     } else {
-                        nimCurrentTurn = 1; // Back to player
+                        nimCurrentTurn = 1;
                         updateNimTurnIndicator();
                     }
                 }, 1000);
             } else {
-                // PvP Mode
                 nimCurrentTurn = (nimCurrentTurn === 1) ? 2 : 1;
                 updateNimTurnIndicator();
             }
